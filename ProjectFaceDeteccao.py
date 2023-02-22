@@ -1,9 +1,11 @@
 import cv2
+import os
 
 video_capture = cv2.VideoCapture(0)
 faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-# eyeCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
-# smileCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_smile.xml')
+
+counter = 0  # Inicializa o contador de imagens
+
 while True:
     ret, frame = video_capture.read()
 
@@ -18,9 +20,16 @@ while True:
     for(x, y, w, h) in faces:
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0,255,0), 2)
 
-    #eyes = eyeCascade.detectMultiScale(gray, 1.2, 18)
-    #for(x, y, w, h) in eyes:
-    #    cv2.rectangle(frame, (x, y), (x+w, y+h), (255,0,0), 2)
+        # Salva a foto da detecção
+        while True:
+            counter += 1
+            filename = "detected_face_{:04d}.jpg".format(counter)  # Gera o nome do arquivo com um número sequencial
+            if not os.path.exists(filename):
+                break  # Sai do loop se o arquivo não existir
+
+        roi_gray = gray[y:y+h, x:x+w]
+        roi_color = frame[y:y+h, x:x+w]
+        cv2.imwrite(filename, roi_color)
 
     cv2.imshow('video', frame)
 
@@ -29,5 +38,4 @@ while True:
 
 video_capture.release()
 cv2.destroyAllWindows()
-
 
